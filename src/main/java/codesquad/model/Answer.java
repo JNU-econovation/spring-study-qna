@@ -1,8 +1,11 @@
 package codesquad.model;
 
+import codesquad.exception.UnAuthorizedException;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 
 @Getter
@@ -16,6 +19,7 @@ public class Answer {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_parent_id"))
     private Question question;
 
@@ -30,17 +34,23 @@ public class Answer {
     private String time;
 
     @Column(nullable = false)
-    private boolean delete;
+    private boolean deleted;
+
+    private String url;
 
     public Answer(User writer, Question question, String contents) {
         this.writer = writer;
         this.question = question;
         this.contents = contents;
-        this.delete = false;
+        this.url = "/api/questions/" + question.getId() + "/answers";
+        this.deleted = false;
     }
 
-    public void delete() {
-        this.delete = true;
+    public void delete(User sessionedUser) {
+        if (!isSameWriter(sessionedUser)) {
+            throw new UnAuthorizedException();
+        }
+        this.deleted = true;
     }
 
     public boolean isSameWriter(User sessionedUser) {

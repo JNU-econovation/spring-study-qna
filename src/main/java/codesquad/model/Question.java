@@ -1,9 +1,11 @@
 package codesquad.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,10 +34,17 @@ public class Question {
     private User writer;
 
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference
     private List<Answer> answers;
 
     public Question() {
         this.deleted = false;
+        this.answers = new ArrayList<>();
+    }
+
+    public void addAnswer(Answer answer) {
+        answer.setQuestion(this);
+        this.answers.add(answer);
     }
 
     public void update(Question updatedQuestion) {
