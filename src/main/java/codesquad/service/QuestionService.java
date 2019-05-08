@@ -5,10 +5,12 @@ import codesquad.exception.NullUserException;
 import codesquad.exception.WrongUserException;
 import codesquad.model.answer.Answer;
 import codesquad.model.answer.AnswerRepository;
+import codesquad.model.content.Content;
 import codesquad.model.question.Question;
 import codesquad.model.question.QuestionRepository;
 import codesquad.model.user.User;
 import codesquad.model.user.UserRepository;
+import codesquad.utils.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,22 +63,20 @@ public class QuestionService {
         return true;
     }
 
-    public void saveAnswer(HttpSession session, Answer answer, Long questionId) {
-        User user = (User) session.getAttribute("user");
-        answer.setWriter(user);
-        answer.setQuestion(findById(questionId));
-        answer.setId(null);
-        answerRepository.save(answer);
+    public Answer saveAnswer(HttpSession session, Content content, Long questionId) {
+        User loginUser = SessionUtil.loginUser(session);
+        Question question = findById(questionId);
+        return answerRepository.save(new Answer(loginUser, question, content.getContent()));
     }
 
-    public void deleteAnswer(Long id, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public Answer deleteAnswer(Long id, HttpSession session) {
+        User loginUser = SessionUtil.loginUser(session);
         Answer answer = answerRepository.findById(id).orElseThrow(() -> new RuntimeException());
-        if (!answer.isWriter(user)) {
-            throw new WrongUserException(user.getId());
+        if (!answer.isWriter(loginUser)) {
+            throw new WrongUserException(loginUser.getId());
         }
         answer.setDeleted(true);
-        answerRepository.save(answer);
+        return answerRepository.save(answer);
     }
 
 }

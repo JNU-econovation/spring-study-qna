@@ -1,6 +1,5 @@
 package codesquad.controller;
 
-import codesquad.model.answer.Answer;
 import codesquad.model.question.Question;
 import codesquad.model.user.User;
 import codesquad.service.QuestionService;
@@ -58,30 +57,6 @@ public class QuestionController {
         }
         questionService.delete(id, session);
         return "redirect:/";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateQuestion(Question newQuestion, @PathVariable Long id) {
-        questionService.update(id, newQuestion);
-        return "redirect:/";
-    }
-
-    @PostMapping("/{id}/answer")
-    public String addAnswer(Answer answer, @PathVariable Long id, HttpSession session) {
-        if (!SessionUtil.isLogin(session)) {
-            return "redirect:/users/loginForm";
-        }
-        questionService.saveAnswer(session, answer, id);
-        return "redirect:/question/" + id.toString();
-    }
-
-    @DeleteMapping("/{id}/answer/{answerId}")
-    public String deleteAnswer(@PathVariable Long id, @PathVariable Long answerId, HttpSession session) {
-        if (!SessionUtil.isLogin(session)) {
-            return "redirect:/users/loginForm";
-        }
-        questionService.deleteAnswer(answerId, session);
-        return "redirect:/question/" + id.toString();
     }
 
 }

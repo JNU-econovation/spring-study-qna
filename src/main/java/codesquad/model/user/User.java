@@ -1,13 +1,16 @@
 package codesquad.model.user;
 
 import codesquad.model.answer.Answer;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -27,6 +30,7 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "question")
     private List<Answer> answers;
 
